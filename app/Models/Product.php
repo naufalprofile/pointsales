@@ -67,11 +67,20 @@ class Product extends Model
 
     /**
      * image
+     * Di-override langsung ke Unsplash biar halaman kasir ga pecah-pecah lagi jirr!
      */
     protected function image(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => asset('/storage/products/'.$value),
+            get: function ($value) {
+                // Ambil kata pertama dari nama produk biar keyword pencariannya fokus
+                // Contoh: "Aqua Botol 600ml" -> diambil "Aqua"
+                $firstWord = explode(' ', $this->title)[0] ?? 'product';
+                $keyword = urlencode(strtolower($firstWord));
+
+                // Gunakan URL images.unsplash.com resmi yang super stabil dengan signature keyword unik
+                return "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=400&auto=format&fit=crop&sig=" . $keyword;
+            },
         );
     }
 }
